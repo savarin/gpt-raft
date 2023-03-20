@@ -14,25 +14,16 @@ logs_by_identifier = {'a': [LogEntry(term=1, item='1'), LogEntry(term=1, item='1
 
     def test_append_entries_paper(logs_by_identifier):
         # Figure 7a
-        assert not raftlog.append_entries(
+>       assert not raftlog.append_entries(
             logs_by_identifier["a"], 9, 6, [raftlog.LogEntry(6, "6")]
         )
+E       AssertionError: assert not True
+E        +  where True = <function append_entries at 0x1100b04a0>([LogEntry(term=1, item='1'), LogEntry(term=1, item='1'), LogEntry(term=1, item='1'), LogEntry(term=4, item='4'), LogEntry(term=4, item='4'), LogEntry(term=5, item='5'), ...], 9, 6, [LogEntry(term=6, item='6')])
+E        +    where <function append_entries at 0x1100b04a0> = raftlog.append_entries
 
-        # Figure 7b
-        assert not raftlog.append_entries(
-            logs_by_identifier["b"], 9, 6, [raftlog.LogEntry(6, "6")]
-        )
-
-        # Figure 7c
-        log_c = logs_by_identifier["c"]
->       assert raftlog.append_entries(log_c, 9, 6, [raftlog.LogEntry(6, "6")])
-E       AssertionError: assert False
-E        +  where False = <function append_entries at 0x106a684a0>([LogEntry(term=1, item='1'), LogEntry(term=1, item='1'), LogEntry(term=1, item='1'), LogEntry(term=4, item='4'), LogEntry(term=4, item='4'), LogEntry(term=5, item='5'), ...], 9, 6, [LogEntry(term=6, item='6')])
-E        +    where <function append_entries at 0x106a684a0> = raftlog.append_entries
-
-src/test_raftlog.py:81: AssertionError
+src/test_raftlog.py:70: AssertionError
 ====================================================== short test summary info ======================================================
-FAILED src/test_raftlog.py::test_append_entries_paper - AssertionError: assert False
+FAILED src/test_raftlog.py::test_append_entries_paper - AssertionError: assert not True
 ========================================================= 1 failed in 0.07s =========================================================
 """
 from dataclasses import dataclass
@@ -62,7 +53,7 @@ def append_entries(
         True if the entries were appended, False otherwise.
     """
 
-    if prev_log_index >= len(log) or log[prev_log_index].term != leader_term:
+    if prev_log_index >= len(log) or log[prev_log_index].term >= leader_term:
         return False
 
     # Remove any conflicting entries and append new entries
