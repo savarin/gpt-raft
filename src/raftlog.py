@@ -27,8 +27,8 @@ logs_by_identifier = {'a': [LogEntry(term=1, item='1'), LogEntry(term=1, item='1
         log_c = logs_by_identifier["c"]
 >       assert raftlog.append_entries(log_c, 9, 6, [raftlog.LogEntry(6, "6")])
 E       AssertionError: assert False
-E        +  where False = <function append_entries at 0x105d64400>([LogEntry(term=1, item='1'), LogEntry(term=1, item='1'), LogEntry(term=1, item='1'), LogEntry(term=4, item='4'), LogEntry(term=4, item='4'), LogEntry(term=5, item='5'), ...], 9, 6, [LogEntry(term=6, item='6')])
-E        +    where <function append_entries at 0x105d64400> = raftlog.append_entries
+E        +  where False = <function append_entries at 0x10ba0c400>([LogEntry(term=1, item='1'), LogEntry(term=1, item='1'), LogEntry(term=1, item='1'), LogEntry(term=4, item='4'), LogEntry(term=4, item='4'), LogEntry(term=5, item='5'), ...], 9, 6, [LogEntry(term=6, item='6')])
+E        +    where <function append_entries at 0x10ba0c400> = raftlog.append_entries
 
 src/test_raftlog.py:81: AssertionError
 ====================================================== short test summary info ======================================================
@@ -62,12 +62,13 @@ def append_entries(
         True if the entries were appended, False otherwise.
     """
 
+    if prev_log_index > len(log):
+        return False
+
     if prev_log_index > 0:
-        if prev_log_index > len(log):
-            return False
-        if log[prev_log_index - 1].term != leader_term - 1:
+        prev_log_term = log[prev_log_index - 1].term
+        if prev_log_term != leader_term - 1:
             return False
 
-    # Remove any conflicting entries and append new entries
-    log[:] = log[: prev_log_index] + entries
+    log = log[:prev_log_index] + entries
     return True
