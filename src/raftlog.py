@@ -27,13 +27,13 @@ logs_by_identifier = {'a': [LogEntry(term=1, item='1'), LogEntry(term=1, item='1
         log_c = logs_by_identifier["c"]
 >       assert raftlog.append_entries(log_c, 9, 6, [raftlog.LogEntry(6, "6")])
 E       AssertionError: assert False
-E        +  where False = <function append_entries at 0x105a08400>([LogEntry(term=1, item='1'), LogEntry(term=1, item='1'), LogEntry(term=1, item='1'), LogEntry(term=4, item='4'), LogEntry(term=4, item='4'), LogEntry(term=5, item='5'), ...], 9, 6, [LogEntry(term=6, item='6')])
-E        +    where <function append_entries at 0x105a08400> = raftlog.append_entries
+E        +  where False = <function append_entries at 0x106b5c4a0>([LogEntry(term=1, item='1'), LogEntry(term=1, item='1'), LogEntry(term=1, item='1'), LogEntry(term=4, item='4'), LogEntry(term=4, item='4'), LogEntry(term=5, item='5'), ...], 9, 6, [LogEntry(term=6, item='6')])
+E        +    where <function append_entries at 0x106b5c4a0> = raftlog.append_entries
 
 src/test_raftlog.py:81: AssertionError
 ====================================================== short test summary info ======================================================
 FAILED src/test_raftlog.py::test_append_entries_paper - AssertionError: assert False
-========================================================= 1 failed in 0.09s =========================================================
+========================================================= 1 failed in 0.07s =========================================================
 """
 from dataclasses import dataclass
 from typing import List, Union
@@ -66,5 +66,5 @@ def append_entries(
         return False
 
     # Remove any conflicting entries and append new entries
-    log = log[: prev_log_index + 1] + entries
+    log[:] = log[: prev_log_index + 1] + entries
     return True
